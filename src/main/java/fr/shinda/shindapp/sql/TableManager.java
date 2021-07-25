@@ -151,7 +151,6 @@ public class TableManager {
         if (!userSanctionDataTableExist()) {
             createUserSactionDataTable();
         }
-
     }
 
 }

@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.interactions.components.Button;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class SlashKickCmd extends SlashCommand {
 
@@ -25,8 +26,8 @@ public class SlashKickCmd extends SlashCommand {
     private String messageID;
 
     public SlashKickCmd(EventWaiter waiter) {
-        this.name = "ban";
-        this.help = "Permet aux staff du discord de bannir une personne mentionné";
+        this.name = "kick";
+        this.help = "Permet aux staff du discord de kick une personne mentionnée";
         this.botPermissions = new Permission[]{Permission.ADMINISTRATOR};
         this.guildOnly = true;
         this.waiter = waiter;
@@ -103,7 +104,7 @@ public class SlashKickCmd extends SlashCommand {
                             .setDescription("Vous venez d'annuler la commande.");
                     e.getHook().sendMessageEmbeds(waiterEmbed.build()).queue();
                 }
-            });
+            }, 5, TimeUnit.MINUTES, () -> event.getHook().sendMessage(event.getMember() + ", vous avez été trop lent.").queue());
 
         } else {
             EmbedBuilder embed = new EmbedBuilder()

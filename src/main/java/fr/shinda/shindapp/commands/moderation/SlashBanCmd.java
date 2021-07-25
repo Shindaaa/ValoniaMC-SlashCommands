@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.interactions.components.Button;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class SlashBanCmd extends SlashCommand {
 
@@ -26,7 +27,7 @@ public class SlashBanCmd extends SlashCommand {
 
     public SlashBanCmd(EventWaiter waiter) {
         this.name = "ban";
-        this.help = "Permet aux staff du discord de bannir une personne mentionné";
+        this.help = "Permet aux staff du discord de bannir une personne mentionnée";
         this.botPermissions = new Permission[]{Permission.ADMINISTRATOR};
         this.guildOnly = true;
         this.waiter = waiter;
@@ -103,7 +104,7 @@ public class SlashBanCmd extends SlashCommand {
                             .setDescription("Vous venez d'annuler la commande.");
                     e.getHook().sendMessageEmbeds(waiterEmbed.build()).queue();
                 }
-            });
+            }, 10, TimeUnit.MINUTES, () -> event.getHook().sendMessage(event.getMember() + ", vous avez été trop lent.").queue());
 
         } else {
             EmbedBuilder embed = new EmbedBuilder()

@@ -7,10 +7,12 @@ import fr.shinda.shindapp.commands.moderation.SlashBanCmd;
 import fr.shinda.shindapp.commands.moderation.SlashKickCmd;
 import fr.shinda.shindapp.commands.op.SlashManuaddCmd;
 import fr.shinda.shindapp.commands.op.SlashSyncAllCmd;
+import fr.shinda.shindapp.commands.suggestion.SlashSuggestionCmd;
 import fr.shinda.shindapp.listeners.GuildListeners;
 import fr.shinda.shindapp.utils.ConfigUtils;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -33,6 +35,7 @@ public class Shindapp {
             builder.addSlashCommands(new SlashSyncAllCmd());
             builder.addSlashCommands(new SlashKickCmd(eventWaiter));
             builder.addSlashCommands(new SlashBanCmd(eventWaiter));
+            builder.addSlashCommands(new SlashSuggestionCmd(eventWaiter));
 
             CommandClient client = builder.build();
 

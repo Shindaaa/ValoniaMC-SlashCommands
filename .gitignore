@@ -1,0 +1,5 @@
+.idea
+src/main/resources
+ValoniaMC-Chewtils.iml
+# Project exclude paths
+/target/

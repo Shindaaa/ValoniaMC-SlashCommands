@@ -74,7 +74,10 @@ public class SlashSuggestionCmd extends SlashCommand {
                         .addField("Auteur:", e.getMember().getUser().getName(), true)
                         .addField("Serveur:", server, true)
                         .addField("Description de la suggestion:", content, false);
-                waitingChannel.sendMessageEmbeds(waiterEmbed.build()).queue();
+                waitingChannel.sendMessageEmbeds(waiterEmbed.build()).queue(success -> {
+                    success.addReaction("a:aayes:726735611414839356").queue();
+                    success.addReaction("a:aano:726735731153829928").queue();
+                });
 
                 EmbedBuilder waiterEmbedFinal = new EmbedBuilder()
                         .setColor(Colors.MAIN.getHexCode())

@@ -93,7 +93,7 @@ public class SlashManuaddCmd extends SlashCommand {
 
                     EmbedBuilder waiterEmbed = new EmbedBuilder()
                             .setColor(Colors.MAIN.getHexCode())
-                            .setDescription(e.getMember() + ", vous venez d'ajouter `" + user.getUser().getName() + "` au groupe: `" + Ranks.ADMIN.getRankName() + "`");
+                            .setDescription(e.getMember().getUser().getName() + ", vous venez d'ajouter `" + user.getUser().getName() + "` au groupe: `" + Ranks.ADMIN.getRankName() + "`");
                     e.getHook().sendMessageEmbeds(waiterEmbed.build()).queue();
                     return;
                 }
@@ -117,7 +117,7 @@ public class SlashManuaddCmd extends SlashCommand {
 
                     EmbedBuilder waiterEmbed = new EmbedBuilder()
                             .setColor(Colors.MAIN.getHexCode())
-                            .setDescription(e.getMember() + ", vous venez d'ajouter `" + user.getUser().getName() + "` au groupe: `" + Ranks.MOD.getRankName() + "`");
+                            .setDescription(e.getMember().getUser().getName() + ", vous venez d'ajouter `" + user.getUser().getName() + "` au groupe: `" + Ranks.MOD.getRankName() + "`");
                     e.getHook().sendMessageEmbeds(waiterEmbed.build()).queue();
                     return;
                 }
@@ -141,7 +141,7 @@ public class SlashManuaddCmd extends SlashCommand {
 
                     EmbedBuilder waiterEmbed = new EmbedBuilder()
                             .setColor(Colors.MAIN.getHexCode())
-                            .setDescription(e.getMember() + ", vous venez d'ajouter `" + user.getUser().getName() + "` au groupe: `" + Ranks.HELPER.getRankName() + "`");
+                            .setDescription(e.getMember().getUser().getName() + ", vous venez d'ajouter `" + user.getUser().getName() + "` au groupe: `" + Ranks.HELPER.getRankName() + "`");
                     e.getHook().sendMessageEmbeds(waiterEmbed.build()).queue();
                     return;
                 }
@@ -150,11 +150,11 @@ public class SlashManuaddCmd extends SlashCommand {
                     e.getChannel().deleteMessageById(messageId).queue();
                     EmbedBuilder waiterEmbed = new EmbedBuilder()
                             .setColor(Colors.MAIN.getHexCode())
-                            .setDescription(e.getMember() + ", vous venez d'annuler la commande.");
+                            .setDescription(e.getMember().getUser().getName() + ", vous venez d'annuler la commande.");
                     e.getHook().sendMessageEmbeds(waiterEmbed.build()).queue();
                 }
 
-            }, 3, TimeUnit.MINUTES, () -> event.getHook().sendMessage(event.getMember() + ", vous avez été trop lent.").queue());
+            }, 3, TimeUnit.MINUTES, () -> event.getHook().sendMessage(event.getMember().getUser().getName() + ", vous avez été trop lent.").queue());
         }
     }
 }

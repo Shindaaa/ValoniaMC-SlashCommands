@@ -69,7 +69,7 @@ public class SlashBanCmd extends SlashCommand {
                     || user.getRoles().contains(event.getGuild().getRoleById(Ranks.ADMIN.getRankId()))) {
                 EmbedBuilder embed = new EmbedBuilder()
                         .setColor(Colors.MAIN.getHexCode())
-                        .setDescription("Vous ne pouvez pas sanctionner un membre du staff.");
+                        .setDescription(event.getMember().getUser().getName() + ", vous ne pouvez pas sanctionner un membre du staff.");
                 event.getHook().sendMessageEmbeds(embed.build()).queue();
             }
 
@@ -101,7 +101,7 @@ public class SlashBanCmd extends SlashCommand {
 
                     EmbedBuilder waiterEmbed = new EmbedBuilder()
                             .setColor(Colors.MAIN.getHexCode())
-                            .setDescription("Vous venez d'annuler la commande.");
+                            .setDescription(e.getMember().getUser().getName() + ", vous venez d'annuler la commande.");
                     e.getHook().sendMessageEmbeds(waiterEmbed.build()).queue();
                 }
             }, 10, TimeUnit.MINUTES, () -> event.getHook().sendMessage(event.getMember() + ", vous avez été trop lent.").queue());
@@ -109,7 +109,7 @@ public class SlashBanCmd extends SlashCommand {
         } else {
             EmbedBuilder embed = new EmbedBuilder()
                     .setColor(Colors.MAIN.getHexCode())
-                    .setDescription("Vous n'avez pas l'authorisation d'utiliser cette commande.");
+                    .setDescription(event.getMember().getUser().getName() + ", vous n'avez pas l'authorisation d'utiliser cette commande.");
             event.getHook().sendMessageEmbeds(embed.build()).queue();
         }
 

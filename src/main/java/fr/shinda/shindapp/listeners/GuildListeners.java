@@ -4,6 +4,7 @@ import fr.shinda.shindapp.Main;
 import fr.shinda.shindapp.sql.UserData;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,6 +21,10 @@ public class GuildListeners implements EventListener {
 
         if (!authorData.isStored())
             authorData.createData(event.getGuild());
+    }
+
+    public void onDiscordLinkReceived(GuildMessageReceivedEvent event) {
+
     }
 
 }

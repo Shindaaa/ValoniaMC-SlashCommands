@@ -78,7 +78,7 @@ public class SlashSuggestionCmd extends SlashCommand {
 
                 EmbedBuilder waiterEmbedFinal = new EmbedBuilder()
                         .setColor(Colors.MAIN.getHexCode())
-                        .setDescription(e.getMember() + ", votre suggestion a été envoyé dans le salon `" + waitingChannel.getName() + "`");
+                        .setDescription(e.getMember().getUser().getName() + ", votre suggestion a été envoyé dans le salon `" + waitingChannel.getName() + "`");
                 e.getHook().sendMessageEmbeds(waiterEmbedFinal.build()).queue();
             }
 

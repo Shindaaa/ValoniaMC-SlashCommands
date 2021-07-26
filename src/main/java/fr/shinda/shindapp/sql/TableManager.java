@@ -19,7 +19,7 @@ public class TableManager {
 
         try {
 
-            PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE shp_valonia_primary_data (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, guild_id VARCHAR(255), custom_prefix VARCHAR(255), primary_language VARCHAR(11), bot_motd VARCHAR(255), bot_state INT(11), bot_activity INT(11))");
+            PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE shp_valonia_primary_data (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, guild_id VARCHAR(255), discord_link_filter BOOLEAN)");
             preparedStatement.execute();
             preparedStatement.close();
             LoggerFactory.getLogger(TableManager.class).info("Creating shp_valonia_primary_data table on MySQL Database !");

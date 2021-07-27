@@ -5,6 +5,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import fr.shinda.shindapp.Main;
 import fr.shinda.shindapp.enums.Colors;
 import fr.shinda.shindapp.enums.Ranks;
+import fr.shinda.shindapp.sql.SanctionData;
 import fr.shinda.shindapp.sql.UserData;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -84,10 +85,13 @@ public class SlashBanCmd extends SlashCommand {
 
             waiter.waitForEvent(ButtonClickEvent.class, e -> e.getMember().getId().equals(event.getMember().getId()) && e.getChannel().getId().equals(event.getChannel().getId()), e -> {
                 e.deferReply().queue();
+                SanctionData sanctionData = new SanctionData(Main.getConnection(), user);
 
                 if (e.getComponentId().equals("button.ban.confirm")) {
                     e.getChannel().deleteMessageById(messageID).queue();
 
+                    sanctionData.addBan();
+                    sanctionData.setSacntionContent("Ban", reason, e.getMember());
                     user.ban(7).reason("Ban by: " + e.getMember().getUser().getName() + " pour raison: " + reason).queue();
 
                     EmbedBuilder waiterEmbed = new EmbedBuilder()

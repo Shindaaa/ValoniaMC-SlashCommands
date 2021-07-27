@@ -5,6 +5,7 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import fr.shinda.shindapp.commands.moderation.SlashBanCmd;
 import fr.shinda.shindapp.commands.moderation.SlashKickCmd;
+import fr.shinda.shindapp.commands.moderation.SlashWarnCmd;
 import fr.shinda.shindapp.commands.op.SlashDiscordFilterCmd;
 import fr.shinda.shindapp.commands.op.SlashManuaddCmd;
 import fr.shinda.shindapp.commands.op.SlashSyncAllCmd;
@@ -39,6 +40,7 @@ public class Shindapp {
             builder.addSlashCommands(new SlashSyncAllCmd());
             builder.addSlashCommands(new SlashKickCmd(eventWaiter));
             builder.addSlashCommands(new SlashBanCmd(eventWaiter));
+            builder.addSlashCommands(new SlashWarnCmd(eventWaiter));
             builder.addSlashCommands(new SlashSuggestionCmd(eventWaiter));
             builder.addSlashCommands(new SlashDiscordFilterCmd(eventWaiter));
 

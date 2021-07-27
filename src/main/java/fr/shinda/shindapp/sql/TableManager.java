@@ -47,11 +47,11 @@ public class TableManager {
 
     }
 
-    public void createUserSactionDataTable() {
+    public void createSactionDataTable() {
 
         try {
 
-            PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE shp_user_sanction_data (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, user_id VARCHAR(255), last_sanction INT(11), last_moderator VARCHAR(255), last_reason VARCHAR(255), total_kick INT(11), total_warn INT(11), total_ban INT(11))");
+            PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE shp_sanction_data (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, user_id VARCHAR(255), last_sanction INT(11), last_moderator VARCHAR(255), last_reason VARCHAR(255), total_kick INT(11), total_warn INT(11), total_ban INT(11))");
             preparedStatement.execute();
             preparedStatement.close();
             LoggerFactory.getLogger(TableManager.class).info("Creating shp_user_sanction_data table on MySQL Database !");
@@ -113,11 +113,11 @@ public class TableManager {
         return false;
     }
 
-    public boolean userSanctionDataTableExist() {
+    public boolean sanctionDataTableExist() {
 
         try {
 
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT table_name FROM information_schema.TABLES WHERE table_schema = 'shindapp' AND table_name = 'shp_user_sanction_data'");
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT table_name FROM information_schema.TABLES WHERE table_schema = 'shindapp' AND table_name = 'shp_sanction_data'");
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
@@ -148,8 +148,8 @@ public class TableManager {
             createUserDataTable();
         }
 
-        if (!userSanctionDataTableExist()) {
-            createUserSactionDataTable();
+        if (!sanctionDataTableExist()) {
+            createSactionDataTable();
         }
     }
 

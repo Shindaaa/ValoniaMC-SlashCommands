@@ -21,20 +21,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class SlashKickCmd extends SlashCommand {
+public class SlashWarnCmd extends SlashCommand {
 
     EventWaiter waiter;
-    private String messageID;
+    String messageID;
 
-    public SlashKickCmd(EventWaiter waiter) {
-        this.name = "kick";
-        this.help = "Permet aux staff du discord de kick une personne mentionnée";
+    public SlashWarnCmd(EventWaiter waiter) {
+        this.name = "warn";
+        this.help = "Permet aux staff du discord d'avertir une personne mentionnée";
         this.botPermissions = new Permission[]{Permission.ADMINISTRATOR};
         this.guildOnly = true;
         this.waiter = waiter;
 
         List<OptionData> data = new ArrayList<>();
-        data.add(new OptionData(OptionType.USER, "user", "Le membre à kick.").setRequired(true));
+        data.add(new OptionData(OptionType.USER, "user", "Le membre à warn.").setRequired(true));
         data.add(new OptionData(OptionType.STRING, "reason", "La raison de cette sanction.").setRequired(false));
         this.options = data;
     }
@@ -66,41 +66,40 @@ public class SlashKickCmd extends SlashCommand {
             UserData userData = new UserData(Main.getConnection(), user);
 
             if (userData.getRank() >= 30 || user.getRoles().contains(event.getGuild().getRoleById(Ranks.HELPER.getRankId()))
-                || user.getRoles().contains(event.getGuild().getRoleById(Ranks.MOD.getRankId()))
-                || user.getRoles().contains(event.getGuild().getRoleById(Ranks.ADMIN.getRankId()))) {
+                    || user.getRoles().contains(event.getGuild().getRoleById(Ranks.MOD.getRankId()))
+                    || user.getRoles().contains(event.getGuild().getRoleById(Ranks.ADMIN.getRankId()))) {
                 EmbedBuilder embed = new EmbedBuilder()
-                    .setColor(Colors.MAIN.getHexCode())
-                    .setDescription(event.getMember().getUser().getName() + ", vous ne pouvez pas sanctionner un membre du staff.");
+                        .setColor(Colors.MAIN.getHexCode())
+                        .setDescription(event.getMember().getUser().getName() + ", vous ne pouvez pas sanctionner un membre du staff.");
                 event.getHook().sendMessageEmbeds(embed.build()).queue();
             }
 
             EmbedBuilder embed = new EmbedBuilder()
                     .setColor(Colors.MAIN.getHexCode())
-                    .setDescription("Confirmez vous la sanction suivante ?\n\n• Pseudo de la victime: `" + user.getUser().getName() + "`\n• Type de sanction: `Kick`\n• Raison: `" + reason + "`");
+                    .setDescription("Confirmez vous la sanction suivante ?\n\n• Pseudo de la victime: `" + user.getUser().getName() + "`\n• Type de sanction: `Warn`\n• Raison: `" + reason + "`");
             event.getHook().sendMessageEmbeds(embed.build()).addActionRow(
-                    Button.danger("button.kick.confirm", "Confirmer la sanction").withEmoji(Emoji.fromMarkdown("⚠️"))
+                    Button.danger("button.warn.confirm", "Confirmer la sanction").withEmoji(Emoji.fromMarkdown("⚠️"))
             ).addActionRow(
-                    Button.secondary("button.kick.cancel", "Annuler").withEmoji(Emoji.fromMarkdown("↩️"))
+                    Button.secondary("button.warn.cancel", "Annuler").withEmoji(Emoji.fromMarkdown("↩️"))
             ).queue(success -> this.messageID = success.getId());
 
             waiter.waitForEvent(ButtonClickEvent.class, e -> e.getMember().getId().equals(event.getMember().getId()) && e.getChannel().getId().equals(event.getChannel().getId()), e -> {
                 e.deferReply().queue();
                 SanctionData sanctionData = new SanctionData(Main.getConnection(), user);
 
-                if (e.getComponentId().equals("button.kick.confirm")) {
+                if (e.getComponentId().equals("button.warn.confirm")) {
                     e.getChannel().deleteMessageById(messageID).queue();
 
-                    sanctionData.addKick();
-                    sanctionData.setSacntionContent("Kick", reason, e.getMember());
-                    user.kick().reason("Kick by: " + e.getMember().getUser().getName() + " pour raison: " + reason).queue();
+                    sanctionData.addWarn();
+                    sanctionData.setSacntionContent("Warn", reason, e.getMember());
 
                     EmbedBuilder waiterEmbed = new EmbedBuilder()
                             .setColor(Colors.MAIN.getHexCode())
-                            .setDescription("`" + user.getUser().getName() + "` vient d'être kick du discord par `" + e.getMember().getUser().getName() + "`");
+                            .setDescription("`" + user.getUser().getName() + "` vient d'être warn par `" + e.getMember().getUser().getName() + "`");
                     e.getHook().sendMessageEmbeds(waiterEmbed.build()).queue();
                 }
 
-                if (e.getComponentId().equals("button.kick.cancel")) {
+                if (e.getComponentId().equals("button.warn.cancel")) {
                     e.getChannel().deleteMessageById(messageID).queue();
 
                     EmbedBuilder waiterEmbed = new EmbedBuilder()

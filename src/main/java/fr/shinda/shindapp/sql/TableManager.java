@@ -51,7 +51,7 @@ public class TableManager {
 
         try {
 
-            PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE shp_sanction_data (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, user_id VARCHAR(255), last_sanction INT(11), last_moderator VARCHAR(255), last_reason VARCHAR(255), total_kick INT(11), total_warn INT(11), total_ban INT(11))");
+            PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE shp_sanction_data (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, user_id VARCHAR(255), last_sanction VARCHAR(255), last_moderator VARCHAR(255), last_reason VARCHAR(255), total_kick INT(11), total_warn INT(11), total_ban INT(11))");
             preparedStatement.execute();
             preparedStatement.close();
             LoggerFactory.getLogger(TableManager.class).info("Creating shp_user_sanction_data table on MySQL Database !");

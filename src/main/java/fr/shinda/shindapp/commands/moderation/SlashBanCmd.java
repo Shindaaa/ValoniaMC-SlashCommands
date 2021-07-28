@@ -90,6 +90,10 @@ public class SlashBanCmd extends SlashCommand {
                 if (e.getComponentId().equals("button.ban.confirm")) {
                     e.getChannel().deleteMessageById(messageID).queue();
 
+                    if (!sanctionData.isStored()) {
+                        sanctionData.createData();
+                    }
+
                     sanctionData.addBan();
                     sanctionData.setSacntionContent("Ban", reason, e.getMember());
                     user.ban(7).reason("Ban by: " + e.getMember().getUser().getName() + " pour raison: " + reason).queue();

@@ -65,9 +65,7 @@ public class SlashKickCmd extends SlashCommand {
 
             UserData userData = new UserData(Main.getConnection(), user);
 
-            if (userData.getRank() >= 30 || user.getRoles().contains(event.getGuild().getRoleById(Ranks.HELPER.getRankId()))
-                || user.getRoles().contains(event.getGuild().getRoleById(Ranks.MOD.getRankId()))
-                || user.getRoles().contains(event.getGuild().getRoleById(Ranks.ADMIN.getRankId()))) {
+            if (userData.getRank() >= 30) {
                 EmbedBuilder embed = new EmbedBuilder()
                     .setColor(Colors.MAIN.getHexCode())
                     .setDescription(event.getMember().getUser().getName() + ", vous ne pouvez pas sanctionner un membre du staff.");
@@ -89,6 +87,10 @@ public class SlashKickCmd extends SlashCommand {
 
                 if (e.getComponentId().equals("button.kick.confirm")) {
                     e.getChannel().deleteMessageById(messageID).queue();
+
+                    if (!sanctionData.isStored()) {
+                        sanctionData.createData();
+                    }
 
                     sanctionData.addKick();
                     sanctionData.setSacntionContent("Kick", reason, e.getMember());

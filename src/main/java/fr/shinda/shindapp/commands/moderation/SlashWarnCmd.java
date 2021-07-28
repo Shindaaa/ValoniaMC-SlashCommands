@@ -90,6 +90,10 @@ public class SlashWarnCmd extends SlashCommand {
                 if (e.getComponentId().equals("button.warn.confirm")) {
                     e.getChannel().deleteMessageById(messageID).queue();
 
+                    if (!sanctionData.isStored()) {
+                        sanctionData.createData();
+                    }
+
                     sanctionData.addWarn();
                     sanctionData.setSacntionContent("Warn", reason, e.getMember());
 

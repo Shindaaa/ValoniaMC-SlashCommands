@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import fr.shinda.shindapp.commands.moderation.SlashBanCmd;
+import fr.shinda.shindapp.commands.moderation.SlashHistoryCmd;
 import fr.shinda.shindapp.commands.moderation.SlashKickCmd;
 import fr.shinda.shindapp.commands.moderation.SlashWarnCmd;
 import fr.shinda.shindapp.commands.op.SlashDiscordFilterCmd;
@@ -43,6 +44,7 @@ public class Shindapp {
             builder.addSlashCommands(new SlashWarnCmd(eventWaiter));
             builder.addSlashCommands(new SlashSuggestionCmd(eventWaiter));
             builder.addSlashCommands(new SlashDiscordFilterCmd(eventWaiter));
+            builder.addSlashCommands(new SlashHistoryCmd());
 
             CommandClient client = builder.build();
 

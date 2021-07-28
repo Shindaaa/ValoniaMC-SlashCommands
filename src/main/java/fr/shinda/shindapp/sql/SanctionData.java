@@ -40,7 +40,7 @@ public class SanctionData {
 
         try {
 
-            PreparedStatement preparedStatement = connection.prepareStatement("INSET INTO shp_sanction_data (user_id, last_sanction, last_moderator, last_reason, total_kick, total_warn, total_ban) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO shp_sanction_data (user_id, last_sanction, last_moderator, last_reason, total_kick, total_warn, total_ban) VALUES (?, ?, ?, ?, ?, ?, ?)");
             preparedStatement.setString(1, user.getId());
             preparedStatement.setString(2, "---");
             preparedStatement.setString(3, "---");
@@ -59,7 +59,7 @@ public class SanctionData {
 
         try {
 
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_warn = total_warn + ? WHERE user_id ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_warn = total_warn + ? WHERE user_id = ?");
             preparedStatement.setInt(1, 1);
             preparedStatement.setString(2, user.getId());
             preparedStatement.executeUpdate();
@@ -73,7 +73,7 @@ public class SanctionData {
 
         try {
 
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_kick = total_kick + ? WHERE user_id ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_kick = total_kick + ? WHERE user_id = ?");
             preparedStatement.setInt(1, 1);
             preparedStatement.setString(2, user.getId());
             preparedStatement.executeUpdate();
@@ -87,7 +87,7 @@ public class SanctionData {
 
         try {
 
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_ban = total_ban + ? WHERE user_id ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_ban = total_ban + ? WHERE user_id = ?");
             preparedStatement.setInt(1, 1);
             preparedStatement.setString(2, user.getId());
             preparedStatement.executeUpdate();
@@ -101,17 +101,17 @@ public class SanctionData {
 
         try {
 
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET last_sanction WHERE user_id ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET last_sanction = ? WHERE user_id = ?");
             preparedStatement.setString(1, sanction);
             preparedStatement.setString(2, user.getId());
             preparedStatement.executeUpdate();
 
-            PreparedStatement preparedStatement1 = connection.prepareStatement("UPDATE shp_sanction_data SET last_reason WHERE user_id ?");
+            PreparedStatement preparedStatement1 = connection.prepareStatement("UPDATE shp_sanction_data SET last_reason = ? WHERE user_id = ?");
             preparedStatement1.setString(1, reason);
             preparedStatement1.setString(2, user.getId());
             preparedStatement1.executeUpdate();
 
-            PreparedStatement preparedStatement2 = connection.prepareStatement("UPDATE shp_sanction_data SET last_moderator WHERE user_id ?");
+            PreparedStatement preparedStatement2 = connection.prepareStatement("UPDATE shp_sanction_data SET last_moderator = ? WHERE user_id = ?");
             preparedStatement2.setString(1, moderator.getUser().getName());
             preparedStatement2.setString(2, user.getId());
             preparedStatement2.executeUpdate();

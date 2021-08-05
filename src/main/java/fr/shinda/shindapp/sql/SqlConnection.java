@@ -19,45 +19,27 @@ public class SqlConnection {
         this.password = password;
     }
 
-    public void connect() {
+    public void connect() throws SQLException, ClassNotFoundException {
+        if (connection != null && !connection.isClosed()) {
+            return;
+        }
 
-        try {
+        synchronized (this) {
 
             if (connection != null && !connection.isClosed()) {
                 return;
             }
 
-            synchronized (this) {
-
-                if (connection != null && !connection.isClosed()) {
-                    return;
-                }
-
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                connection = DriverManager.getConnection(this.urlBase + this.host + ":" + this.port + "/" + this.database + "?autoReconnect=true&wait_timeout=86400&serverTimezone=CET", this.user, this.password);
-            }
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(this.urlBase + this.host + ":" + this.port + "/" + this.database + "?autoReconnect=true&wait_timeout=86400&serverTimezone=CET", this.user, this.password);
         }
-
     }
 
-    public void disconnect() {
-
+    public void disconnect() throws SQLException {
         if (isConnected()) {
-
-            try {
-
-                connection.close();
-                System.out.println("Successfully disconnected to SQL Database !");
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
+            connection.close();
+            System.out.println("Successfully disconnected to SQL Database !");
         }
-
     }
 
     public boolean isConnected() {

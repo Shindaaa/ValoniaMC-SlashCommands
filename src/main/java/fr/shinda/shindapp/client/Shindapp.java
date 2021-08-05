@@ -7,61 +7,59 @@ import fr.shinda.shindapp.commands.moderation.SlashBanCmd;
 import fr.shinda.shindapp.commands.moderation.SlashHistoryCmd;
 import fr.shinda.shindapp.commands.moderation.SlashKickCmd;
 import fr.shinda.shindapp.commands.moderation.SlashWarnCmd;
-import fr.shinda.shindapp.commands.op.SlashDiscordFilterCmd;
-import fr.shinda.shindapp.commands.op.SlashManuaddCmd;
-import fr.shinda.shindapp.commands.op.SlashSyncAllCmd;
+import fr.shinda.shindapp.commands.admin.SlashLinkFilterCmd;
+import fr.shinda.shindapp.commands.admin.SlashManuaddCmd;
+import fr.shinda.shindapp.commands.admin.SlashSyncAllCmd;
 import fr.shinda.shindapp.commands.suggestion.SlashSuggestionCmd;
 import fr.shinda.shindapp.listeners.GuildListeners;
 import fr.shinda.shindapp.utils.ConfigUtils;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
+import javax.security.auth.login.LoginException;
+
 public class Shindapp {
 
     EventWaiter eventWaiter = new EventWaiter();
 
-    public void initClient() {
+    public void initClient() throws LoginException, InterruptedException {
 
-        try {
+        CommandClientBuilder builder = new CommandClientBuilder();
+        builder.setOwnerId(ConfigUtils.getConfig("client.ownerid"));
+        builder.setCoOwnerIds(ConfigUtils.getConfig("client.coownerid"));
+        builder.setPrefix("!");
+        builder.setAlternativePrefix("<@!" + ConfigUtils.getConfig("client.clientid") + "> ");
+        builder.setActivity(Activity.streaming("play.valoniamc.eu", "https://www.twitch.tv/grayr0ot"));
 
-            CommandClientBuilder builder = new CommandClientBuilder();
-            builder.setOwnerId(ConfigUtils.getConfig("client.ownerid"));
-            builder.setCoOwnerIds(ConfigUtils.getConfig("client.coownerid"));
-            builder.setPrefix("!");
-            builder.setActivity(Activity.competing("play.valoniamc.eu"));
-            builder.setStatus(OnlineStatus.DO_NOT_DISTURB);
+        builder.forceGuildOnly("655074344619343873");
+        builder.addSlashCommands(
+                new SlashManuaddCmd(eventWaiter),
+                new SlashSyncAllCmd(),
+                new SlashKickCmd(eventWaiter),
+                new SlashBanCmd(eventWaiter),
+                new SlashWarnCmd(eventWaiter),
+                new SlashSuggestionCmd(eventWaiter),
+                new SlashLinkFilterCmd(eventWaiter),
+                new SlashHistoryCmd()
+        );
 
-            builder.forceGuildOnly("744250667677515816");
-            builder.addSlashCommands(new SlashManuaddCmd(eventWaiter));
-            builder.addSlashCommands(new SlashSyncAllCmd());
-            builder.addSlashCommands(new SlashKickCmd(eventWaiter));
-            builder.addSlashCommands(new SlashBanCmd(eventWaiter));
-            builder.addSlashCommands(new SlashWarnCmd(eventWaiter));
-            builder.addSlashCommands(new SlashSuggestionCmd(eventWaiter));
-            builder.addSlashCommands(new SlashDiscordFilterCmd(eventWaiter));
-            builder.addSlashCommands(new SlashHistoryCmd());
+        CommandClient client = builder.build();
 
-            CommandClient client = builder.build();
+        JDABuilder jda = JDABuilder.createDefault(ConfigUtils.getConfig("client.key"))
+                .addEventListeners(client, eventWaiter)
+                .addEventListeners(new GuildListeners())
+                .setChunkingFilter(ChunkingFilter.ALL)
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                .enableIntents(GatewayIntent.GUILD_PRESENCES)
+                .enableCache(CacheFlag.ACTIVITY);
 
-            JDABuilder jda = JDABuilder.createDefault(ConfigUtils.getConfig("client.key"))
-                    .addEventListeners(client, eventWaiter)
-                    .addEventListeners(new GuildListeners())
-                    .setChunkingFilter(ChunkingFilter.ALL)
-                    .setMemberCachePolicy(MemberCachePolicy.ALL)
-                    .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                    .enableIntents(GatewayIntent.GUILD_PRESENCES)
-                    .enableCache(CacheFlag.ACTIVITY);
-
-            jda.build().awaitReady();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        jda.build().awaitReady();
 
     }
 

@@ -3,10 +3,10 @@ package fr.shinda.shindapp.commands.moderation;
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import fr.shinda.shindapp.Main;
-import fr.shinda.shindapp.enums.Colors;
-import fr.shinda.shindapp.enums.Ranks;
+import fr.shinda.shindapp.enums.*;
 import fr.shinda.shindapp.sql.SanctionData;
 import fr.shinda.shindapp.sql.UserData;
+import io.sentry.Sentry;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.Button;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 public class SlashKickCmd extends SlashCommand {
 
     EventWaiter waiter;
-    private String messageID;
 
     public SlashKickCmd(EventWaiter waiter) {
         this.name = "kick";
@@ -44,79 +44,115 @@ public class SlashKickCmd extends SlashCommand {
         UserData authorData = new UserData(Main.getConnection(), event.getMember());
         event.deferReply().queue();
 
-        if (event.getMember().getRoles().contains(event.getGuild().getRoleById(Ranks.OP.getRankId())) || authorData.getRank() >= Ranks.HELPER.getId()) {
+        try {
 
-            Member user = event.getOption("user").getAsMember();
-            String reason;
+            if (event.getMember().getRoles().contains(event.getGuild().getRoleById(Ranks.OP.getRankId())) || authorData.getRank() >= Ranks.HELPER.getId()) {
 
-            if (user == null) {
-                EmbedBuilder embed = new EmbedBuilder()
-                        .setColor(Colors.MAIN.getHexCode())
-                        .setDescription("La personne mentionné est introuvable ou renvoit une valeur null");
-                event.getHook().sendMessageEmbeds(embed.build()).queue();
-                return;
-            }
+                Member user = event.getOption("user").getAsMember();
+                String reason;
 
-            if (event.getOption("reason") == null) {
-                reason = "No reason provided";
+                if (user == null) {
+                    event.getHook().sendMessageEmbeds(
+                            new EmbedBuilder()
+                                    .setColor(Colors.ERROR.getHexCode())
+                                    .setDescription(String.format(Errors.USER_NOT_FOUND.getContent(), event.getMember().getUser().getName(), user.getUser().getName()))
+                                    .build()
+                    ).queue();
+                    return;
+                }
+
+                if (event.getOption("reason") == null)
+                    reason = Responses.DEFAULT_REASON.getContent();
+                else
+                    reason = event.getOption("reason").getAsString();
+
+                UserData userData = new UserData(Main.getConnection(), user);
+
+                if (userData.getRank() >= 30) {
+                    event.getHook().sendMessageEmbeds(
+                            new EmbedBuilder()
+                                    .setColor(Colors.ERROR.getHexCode())
+                                    .setDescription(String.format(Errors.USER_IS_STAFF.getContent(), event.getMember().getUser().getName(), user.getUser().getName()))
+                                    .build()
+                    ).queue();
+                    return;
+                }
+
+                event.getHook().sendMessageEmbeds(
+                        new EmbedBuilder()
+                                .setColor(Colors.MAIN.getHexCode())
+                                .setDescription(String.format(Responses.GLOBAL_SANCTION_WAITING.getContent(), event.getMember().getUser().getName(), "Kick", reason))
+                                .build()
+                ).addActionRow(
+                        Button.danger(Buttons.BUTTON_SANCTION_CONFIRM.getButtonId(), Buttons.BUTTON_SANCTION_CONFIRM.getButtonName()).withEmoji(Emoji.fromMarkdown("⚠️"))
+                ).addActionRow(
+                        Button.secondary(Buttons.BUTTON_GLOBAL_CANCEL.getButtonId(), Buttons.BUTTON_GLOBAL_CANCEL.getButtonName()).withEmoji(Emoji.fromMarkdown("↩️"))
+                ).queue(success -> {
+
+                    waiter.waitForEvent(ButtonClickEvent.class, e -> e.getMember().getId().equals(event.getMember().getId()) && e.getChannel().getId().equals(event.getChannel().getId()), e -> {
+                        e.deferReply().queue();
+                        SanctionData sanctionData = new SanctionData(Main.getConnection(), user);
+
+                        if (e.getComponentId().equals(Buttons.BUTTON_SANCTION_CONFIRM.getButtonId())) {
+                            e.getChannel().deleteMessageById(success.getId()).queue();
+
+                            try {
+                                if (!sanctionData.isStored())
+                                    sanctionData.createData();
+                                sanctionData.addKick();
+                                sanctionData.setSanctionContent("Kick", reason, e.getMember());
+                                user.kick().reason(String.format(Responses.GLOBAL_SANCTION_REASON.getContent(), e.getMember().getUser().getName(), "kick", user.getUser().getName(), reason)).queue();
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                                Sentry.captureException(ex);
+                                e.getHook().sendMessageEmbeds(
+                                        new EmbedBuilder()
+                                                .setColor(Colors.ERROR.getHexCode())
+                                                .setDescription(String.format(Errors.GLOBAL_TRY_CATCH_ERROR.getContent(), ex.getClass().getName(), ex.getMessage()))
+                                                .build()
+                                ).queue();
+                                return;
+                            }
+
+                            e.getHook().sendMessageEmbeds(
+                                    new EmbedBuilder()
+                                            .setColor(Colors.MAIN.getHexCode())
+                                            .setDescription(String.format(Responses.GLOBAL_SANCTION_REASON.getContent(), e.getMember().getUser().getName(), "kick", user.getUser().getName(), reason))
+                                            .build()
+                            ).queue();
+                        }
+
+                        if (e.getComponentId().equals(Buttons.BUTTON_GLOBAL_CANCEL.getButtonId())) {
+                            e.getChannel().deleteMessageById(success.getId()).queue();
+
+                            e.getHook().sendMessageEmbeds(
+                                    new EmbedBuilder()
+                                            .setColor(Colors.MAIN.getHexCode())
+                                            .setDescription(String.format(Responses.GLOBAL_CMD_CANCEL.getContent(), e.getMember().getUser().getName()))
+                                            .build()
+                            ).queue();
+                        }
+
+                    }, 10, TimeUnit.MINUTES, () -> event.getHook().sendMessageEmbeds(
+                            new EmbedBuilder()
+                                    .setColor(Colors.MAIN.getHexCode())
+                                    .setDescription(String.format(Responses.GLOBAL_CMD_TIME_OUT.getContent(), event.getMember().getUser().getName()))
+                                    .build()
+                    ).queue());
+
+                });
             } else {
-                reason = event.getOption("reason").getAsString();
+                event.getHook().sendMessageEmbeds(
+                        new EmbedBuilder()
+                                .setColor(Colors.ERROR.getHexCode())
+                                .setDescription(String.format(Errors.USER_DOSENT_HAVE_PERMS.getContent(), event.getMember().getUser().getName()))
+                                .build()
+                ).queue();
             }
 
-            UserData userData = new UserData(Main.getConnection(), user);
-
-            if (userData.getRank() >= 30) {
-                EmbedBuilder embed = new EmbedBuilder()
-                    .setColor(Colors.MAIN.getHexCode())
-                    .setDescription(event.getMember().getUser().getName() + ", vous ne pouvez pas sanctionner un membre du staff.");
-                event.getHook().sendMessageEmbeds(embed.build()).queue();
-            }
-
-            EmbedBuilder embed = new EmbedBuilder()
-                    .setColor(Colors.MAIN.getHexCode())
-                    .setDescription("Confirmez vous la sanction suivante ?\n\n• Pseudo de la victime: `" + user.getUser().getName() + "`\n• Type de sanction: `Kick`\n• Raison: `" + reason + "`");
-            event.getHook().sendMessageEmbeds(embed.build()).addActionRow(
-                    Button.danger("button.kick.confirm", "Confirmer la sanction").withEmoji(Emoji.fromMarkdown("⚠️"))
-            ).addActionRow(
-                    Button.secondary("button.kick.cancel", "Annuler").withEmoji(Emoji.fromMarkdown("↩️"))
-            ).queue(success -> this.messageID = success.getId());
-
-            waiter.waitForEvent(ButtonClickEvent.class, e -> e.getMember().getId().equals(event.getMember().getId()) && e.getChannel().getId().equals(event.getChannel().getId()), e -> {
-                e.deferReply().queue();
-                SanctionData sanctionData = new SanctionData(Main.getConnection(), user);
-
-                if (e.getComponentId().equals("button.kick.confirm")) {
-                    e.getChannel().deleteMessageById(messageID).queue();
-
-                    if (!sanctionData.isStored()) {
-                        sanctionData.createData();
-                    }
-
-                    sanctionData.addKick();
-                    sanctionData.setSacntionContent("Kick", reason, e.getMember());
-                    user.kick().reason("Kick by: " + e.getMember().getUser().getName() + " pour raison: " + reason).queue();
-
-                    EmbedBuilder waiterEmbed = new EmbedBuilder()
-                            .setColor(Colors.MAIN.getHexCode())
-                            .setDescription("`" + user.getUser().getName() + "` vient d'être kick du discord par `" + e.getMember().getUser().getName() + "`");
-                    e.getHook().sendMessageEmbeds(waiterEmbed.build()).queue();
-                }
-
-                if (e.getComponentId().equals("button.kick.cancel")) {
-                    e.getChannel().deleteMessageById(messageID).queue();
-
-                    EmbedBuilder waiterEmbed = new EmbedBuilder()
-                            .setColor(Colors.MAIN.getHexCode())
-                            .setDescription(e.getMember().getUser().getName() + ", vous venez d'annuler la commande.");
-                    e.getHook().sendMessageEmbeds(waiterEmbed.build()).queue();
-                }
-            }, 5, TimeUnit.MINUTES, () -> event.getHook().sendMessage(event.getMember() + ", vous avez été trop lent.").queue());
-
-        } else {
-            EmbedBuilder embed = new EmbedBuilder()
-                    .setColor(Colors.MAIN.getHexCode())
-                    .setDescription(event.getMember().getUser().getName() + ", vous n'avez pas l'authorisation d'utiliser cette commande.");
-            event.getHook().sendMessageEmbeds(embed.build()).queue();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Sentry.captureException(ex);
         }
 
     }

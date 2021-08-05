@@ -9,248 +9,148 @@ import java.sql.SQLException;
 
 public class SanctionData {
 
-    private Connection connection;
-    private Member user;
+    private final Connection connection;
+    private final Member user;
 
     public SanctionData(Connection connection, Member user) {
         this.connection = connection;
         this.user = user;
     }
 
-    public boolean isStored() {
+    public boolean isStored() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
+        preparedStatement.setString(1, user.getId());
+        ResultSet resultSet = preparedStatement.executeQuery();
 
-        try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
-            preparedStatement.setString(1, user.getId());
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return true;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
+        return resultSet.next();
     }
 
-    public void createData() {
-
-        try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO shp_sanction_data (user_id, last_sanction, last_moderator, last_reason, total_kick, total_warn, total_ban) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            preparedStatement.setString(1, user.getId());
-            preparedStatement.setString(2, "---");
-            preparedStatement.setString(3, "---");
-            preparedStatement.setString(4, "---");
-            preparedStatement.setInt(5, 0);
-            preparedStatement.setInt(6, 0);
-            preparedStatement.setInt(7, 0);
-            preparedStatement.execute();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void createData() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO shp_sanction_data (user_id, last_sanction, last_moderator, last_reason, total_kick, total_warn, total_ban) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        preparedStatement.setString(1, user.getId());
+        preparedStatement.setString(2, "---");
+        preparedStatement.setString(3, "---");
+        preparedStatement.setString(4, "---");
+        preparedStatement.setInt(5, 0);
+        preparedStatement.setInt(6, 0);
+        preparedStatement.setInt(7, 0);
+        preparedStatement.execute();
     }
 
-    public void addWarn() {
-
-        try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_warn = total_warn + ? WHERE user_id = ?");
-            preparedStatement.setInt(1, 1);
-            preparedStatement.setString(2, user.getId());
-            preparedStatement.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void addWarn() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_warn = total_warn + ? WHERE user_id = ?");
+        preparedStatement.setInt(1, 1);
+        preparedStatement.setString(2, user.getId());
+        preparedStatement.executeUpdate();
     }
 
-    public void addKick() {
-
-        try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_kick = total_kick + ? WHERE user_id = ?");
-            preparedStatement.setInt(1, 1);
-            preparedStatement.setString(2, user.getId());
-            preparedStatement.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void addKick() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_kick = total_kick + ? WHERE user_id = ?");
+        preparedStatement.setInt(1, 1);
+        preparedStatement.setString(2, user.getId());
+        preparedStatement.executeUpdate();
     }
 
-    public void addBan() {
-
-        try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_ban = total_ban + ? WHERE user_id = ?");
-            preparedStatement.setInt(1, 1);
-            preparedStatement.setString(2, user.getId());
-            preparedStatement.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void addBan() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET total_ban = total_ban + ? WHERE user_id = ?");
+        preparedStatement.setInt(1, 1);
+        preparedStatement.setString(2, user.getId());
+        preparedStatement.executeUpdate();
     }
 
-    public void setSacntionContent(String sanction, String reason, Member moderator) {
+    public void setSanctionContent(String sanction, String reason, Member moderator) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET last_sanction = ? WHERE user_id = ?");
+        preparedStatement.setString(1, sanction);
+        preparedStatement.setString(2, user.getId());
+        preparedStatement.executeUpdate();
 
-        try {
+        PreparedStatement preparedStatement1 = connection.prepareStatement("UPDATE shp_sanction_data SET last_reason = ? WHERE user_id = ?");
+        preparedStatement1.setString(1, reason);
+        preparedStatement1.setString(2, user.getId());
+        preparedStatement1.executeUpdate();
 
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE shp_sanction_data SET last_sanction = ? WHERE user_id = ?");
-            preparedStatement.setString(1, sanction);
-            preparedStatement.setString(2, user.getId());
-            preparedStatement.executeUpdate();
-
-            PreparedStatement preparedStatement1 = connection.prepareStatement("UPDATE shp_sanction_data SET last_reason = ? WHERE user_id = ?");
-            preparedStatement1.setString(1, reason);
-            preparedStatement1.setString(2, user.getId());
-            preparedStatement1.executeUpdate();
-
-            PreparedStatement preparedStatement2 = connection.prepareStatement("UPDATE shp_sanction_data SET last_moderator = ? WHERE user_id = ?");
-            preparedStatement2.setString(1, moderator.getUser().getName());
-            preparedStatement2.setString(2, user.getId());
-            preparedStatement2.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        PreparedStatement preparedStatement2 = connection.prepareStatement("UPDATE shp_sanction_data SET last_moderator = ? WHERE user_id = ?");
+        preparedStatement2.setString(1, moderator.getUser().getName());
+        preparedStatement2.setString(2, user.getId());
+        preparedStatement2.executeUpdate();
     }
 
-    public int getTotalWarn() {
+    public int getTotalWarn() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
+        preparedStatement.setString(1, user.getId());
+        ResultSet resultSet = preparedStatement.executeQuery();
+        int totalWarn = 0;
 
-        try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
-            preparedStatement.setString(1, user.getId());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            int totalWarn = 0;
-
-            if (resultSet.next()) {
-                totalWarn = resultSet.getInt("total_warn");
-            }
-
-            return totalWarn;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (resultSet.next()) {
+            totalWarn = resultSet.getInt("total_warn");
         }
 
-        return 0;
+        return totalWarn;
     }
 
-    public int getTotalKick() {
+    public int getTotalKick() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
+        preparedStatement.setString(1, user.getId());
+        ResultSet resultSet = preparedStatement.executeQuery();
+        int totalKick = 0;
 
-        try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
-            preparedStatement.setString(1, user.getId());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            int totalKick = 0;
-
-            if (resultSet.next()) {
-                totalKick = resultSet.getInt("total_kick");
-            }
-
-            return totalKick;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (resultSet.next()) {
+            totalKick = resultSet.getInt("total_kick");
         }
 
-        return 0;
+        return totalKick;
     }
 
-    public int getTotalBan() {
+    public int getTotalBan() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
+        preparedStatement.setString(1, user.getId());
+        ResultSet resultSet = preparedStatement.executeQuery();
+        int totalBan = 0;
 
-        try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
-            preparedStatement.setString(1, user.getId());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            int totalBan = 0;
-
-            if (resultSet.next()) {
-                totalBan = resultSet.getInt("total_ban");
-            }
-
-            return totalBan;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (resultSet.next()) {
+            totalBan = resultSet.getInt("total_ban");
         }
 
-        return 0;
+        return totalBan;
     }
 
-    public String getLastSanction() {
+    public String getLastSanction() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
+        preparedStatement.setString(1, user.getId());
+        ResultSet resultSet = preparedStatement.executeQuery();
+        String lastSanction = "---";
 
-        try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
-            preparedStatement.setString(1, user.getId());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            String lastSanction = "---";
-
-            if (resultSet.next()) {
-                lastSanction = resultSet.getString("last_sanction");
-            }
-
-            return lastSanction;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (resultSet.next()) {
+            lastSanction = resultSet.getString("last_sanction");
         }
 
-        return "---";
+        return lastSanction;
     }
 
-    public String getLastReason() {
+    public String getLastReason() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
+        preparedStatement.setString(1, user.getId());
+        ResultSet resultSet = preparedStatement.executeQuery();
+        String lastReason = "---";
 
-        try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
-            preparedStatement.setString(1, user.getId());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            String lastReason = "---";
-
-            if (resultSet.next()) {
-                lastReason = resultSet.getString("last_reason");
-            }
-
-            return lastReason;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (resultSet.next()) {
+            lastReason = resultSet.getString("last_reason");
         }
 
-        return "---";
+        return lastReason;
     }
 
-    public String getLastModerator() {
+    public String getLastModerator() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
+        preparedStatement.setString(1, user.getId());
+        ResultSet resultSet = preparedStatement.executeQuery();
+        String lastModerator = "---";
 
-        try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM shp_sanction_data WHERE user_id = ?");
-            preparedStatement.setString(1, user.getId());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            String lastModerator = "---";
-
-            if (resultSet.next()) {
-                lastModerator = resultSet.getString("last_moderator");
-            }
-
-            return lastModerator;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (resultSet.next()) {
+            lastModerator = resultSet.getString("last_moderator");
         }
 
-        return "---";
+        return lastModerator;
     }
 
 }

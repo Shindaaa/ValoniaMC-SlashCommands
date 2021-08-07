@@ -36,7 +36,7 @@ public class Shindapp {
         builder.setAlternativePrefix("<@!" + ConfigUtils.getConfig("client.clientid") + "> ");
         builder.setActivity(Activity.streaming("play.valoniamc.eu", "https://www.twitch.tv/grayr0ot"));
 
-        builder.forceGuildOnly("655074344619343873");
+        builder.forceGuildOnly("744250667677515816");
         builder.addSlashCommands(
                 new SlashManuaddCmd(eventWaiter),
                 new SlashSyncAllCmd(),

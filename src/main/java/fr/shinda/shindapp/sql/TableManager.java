@@ -16,7 +16,7 @@ public class TableManager {
     }
 
     private void createGuildDataTable() throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE shp_valonia_primary_data (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, guild_id VARCHAR(255), discord_link_filter BOOLEAN)");
+        PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE shp_valonia_primary_data (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, guild_id VARCHAR(255), discord_link_filter BOOLEAN, debug_event BOOLEAN)");
         preparedStatement.execute();
         preparedStatement.close();
         LoggerFactory.getLogger(TableManager.class).info("Creating shp_valonia_primary_data table on MySQL Database !");

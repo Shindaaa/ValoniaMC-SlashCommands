@@ -1,4 +1,4 @@
-package fr.shinda.shindapp.commands.suggestion;
+package fr.shinda.shindapp.commands.player;
 
 import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -117,6 +117,13 @@ public class SlashSuggestionCmd extends SlashCommand {
 
                 if (e.getComponentId().equals(Buttons.BUTTON_GLOBAL_CANCEL.getButtonId())) {
                     e.getChannel().deleteMessageById(success.getId()).queue();
+
+                    e.getHook().sendMessageEmbeds(
+                            new EmbedBuilder()
+                                    .setColor(Colors.MAIN.getHexCode())
+                                    .setDescription(String.format(Responses.GLOBAL_CMD_CANCEL.getContent(), e.getMember().getUser().getName()))
+                                    .build()
+                    ).queue();
                 }
 
             });

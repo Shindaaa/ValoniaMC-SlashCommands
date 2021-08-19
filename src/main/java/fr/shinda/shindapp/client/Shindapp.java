@@ -44,8 +44,7 @@ public class Shindapp {
                 new SlashWarnCmd(eventWaiter),
                 new SlashSuggestionCmd(eventWaiter),
                 new SlashLinkFilterCmd(eventWaiter),
-                new SlashHistoryCmd(),
-                new SlashSupportCmd()
+                new SlashHistoryCmd()
         );
 
         CommandClient client = builder.build();

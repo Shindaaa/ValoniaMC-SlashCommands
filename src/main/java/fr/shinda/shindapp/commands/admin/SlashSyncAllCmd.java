@@ -24,7 +24,7 @@ public class SlashSyncAllCmd extends SlashCommand {
 
     @Override
     protected void execute(SlashCommandEvent event) {
-        event.deferReply().queue();
+        event.deferReply(true).queue();
         UserData authorData = new UserData(Main.getConnection(), event.getMember());
 
         try {

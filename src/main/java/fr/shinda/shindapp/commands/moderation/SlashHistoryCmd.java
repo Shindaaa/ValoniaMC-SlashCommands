@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-import java.sql.SQLException;
 import java.util.Collections;
 
 public class SlashHistoryCmd extends SlashCommand {
@@ -34,7 +33,7 @@ public class SlashHistoryCmd extends SlashCommand {
 
     @Override
     protected void execute(SlashCommandEvent event) {
-        event.deferReply().queue();
+        event.deferReply(true).queue();
         UserData authorData = new UserData(Main.getConnection(), event.getMember());
 
         try {

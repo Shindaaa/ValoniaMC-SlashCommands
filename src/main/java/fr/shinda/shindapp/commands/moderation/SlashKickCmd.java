@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.Button;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +41,7 @@ public class SlashKickCmd extends SlashCommand {
     @Override
     protected void execute(SlashCommandEvent event) {
         UserData authorData = new UserData(Main.getConnection(), event.getMember());
-        event.deferReply().queue();
+        event.deferReply(true).queue();
 
         try {
 
@@ -90,7 +89,7 @@ public class SlashKickCmd extends SlashCommand {
                 ).queue(success -> {
 
                     waiter.waitForEvent(ButtonClickEvent.class, e -> e.getMember().getId().equals(event.getMember().getId()) && e.getChannel().getId().equals(event.getChannel().getId()), e -> {
-                        e.deferReply().queue();
+                        e.deferReply(true).queue();
                         SanctionData sanctionData = new SanctionData(Main.getConnection(), user);
 
                         if (e.getComponentId().equals(Buttons.BUTTON_SANCTION_CONFIRM.getButtonId())) {

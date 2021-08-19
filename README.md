@@ -13,7 +13,7 @@
 - **/kick** - `Permet aux staff du discord de kick un joueur mentionné.`
 - **/ban** - `Permet aux staff du discord de bannir un joueur mentionné.`
 - **/warn** - `Permet aux staff du discord d'avertir un joueur mentionné`
-- **/history** - `(Work in progress)`
+- **/history** - `Permet aux staff du discord de voir les sanctions d'un joueur mentionné`
 
 ## Commande : Communauté
 

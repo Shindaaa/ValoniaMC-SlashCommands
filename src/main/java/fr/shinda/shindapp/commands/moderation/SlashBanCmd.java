@@ -41,7 +41,7 @@ public class SlashBanCmd extends SlashCommand {
     @Override
     protected void execute(SlashCommandEvent event) {
         UserData authorData = new UserData(Main.getConnection(), event.getMember());
-        event.deferReply().queue();
+        event.deferReply(true).queue();
 
         try {
 
@@ -89,7 +89,7 @@ public class SlashBanCmd extends SlashCommand {
                 ).queue(success -> {
 
                     waiter.waitForEvent(ButtonClickEvent.class, e -> e.getMember().getId().equals(event.getMember().getId()) && e.getChannel().getId().equals(event.getChannel().getId()), e -> {
-                        e.deferReply().queue();
+                        e.deferReply(true).queue();
                         SanctionData sanctionData = new SanctionData(Main.getConnection(), user);
 
                         if (e.getComponentId().equals(Buttons.BUTTON_SANCTION_CONFIRM.getButtonId())) {

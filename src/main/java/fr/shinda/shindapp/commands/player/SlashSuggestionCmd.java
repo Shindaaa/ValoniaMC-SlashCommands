@@ -40,7 +40,7 @@ public class SlashSuggestionCmd extends SlashCommand {
 
     @Override
     protected void execute(SlashCommandEvent event) {
-        event.deferReply().queue();
+        event.deferReply(true).queue();
 
         String server = event.getOption("server").getAsString();
         String content = event.getOption("content").getAsString();
@@ -58,7 +58,7 @@ public class SlashSuggestionCmd extends SlashCommand {
         ).queue(success -> {
 
             waiter.waitForEvent(ButtonClickEvent.class, e -> e.getMember().getId().equals(event.getMember().getId()) && e.getChannel().getId().equals(event.getChannel().getId()), e -> {
-                e.deferReply().queue();
+                e.deferReply(true).queue();
                 MessageChannel waitingChannel = e.getGuild().getTextChannelById(ConfigUtils.getConfig("suggestion.channel.id"));
 
                 if (e.getComponentId().equals(Buttons.BUTTON_SUGGESTION_CONFIRM.getButtonId())) {
@@ -73,14 +73,6 @@ public class SlashSuggestionCmd extends SlashCommand {
                         ).queue();
                         return;
                     }
-
-                    EmbedBuilder waiterEmbed = new EmbedBuilder()
-                            .setColor(Colors.MAIN.getHexCode())
-                            .setThumbnail(e.getMember().getUser().getAvatarUrl())
-                            .setAuthor("Nouvelle suggestion !", null, e.getMember().getUser().getAvatarUrl())
-                            .addField("Auteur:", e.getMember().getUser().getName(), true)
-                            .addField("Serveur:", server, true)
-                            .addField("Description de la suggestion:", content, false);
 
                     try {
                         waitingChannel.sendMessageEmbeds(

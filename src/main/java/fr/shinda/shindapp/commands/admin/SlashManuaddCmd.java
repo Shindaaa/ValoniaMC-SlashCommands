@@ -36,7 +36,7 @@ public class SlashManuaddCmd extends SlashCommand {
 
     @Override
     protected void execute(SlashCommandEvent event) {
-        event.deferReply().queue();
+        event.deferReply(true).queue();
         UserData authorData = new UserData(Main.getConnection(), event.getMember());
 
         try {
@@ -91,7 +91,7 @@ public class SlashManuaddCmd extends SlashCommand {
                 ).queue(success -> {
 
                     waiter.waitForEvent(ButtonClickEvent.class, e -> e.getMember().getId().equals(event.getMember().getId()) && e.getChannel().getId().equals(event.getChannel().getId()), e -> {
-                        e.deferReply().queue();
+                        e.deferReply(true).queue();
 
                         if (e.getComponentId().equals(Buttons.BUTTON_MANUADD_ADMIN.getButtonId())) {
                             e.getChannel().deleteMessageById(success.getId()).queue();
